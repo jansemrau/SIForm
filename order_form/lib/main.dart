@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -217,15 +218,21 @@ class _MyFormPageState extends State<MyFormPage> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        primary: Colors.blue,
+                        backgroundColor: Colors.blue,
                         textStyle: const TextStyle(color: Colors.white)),
                     onPressed: () {
                       // Wenn alle Validatoren der Felder des Formulars gültig sind.
                       if (_formKey.currentState!.validate()) {
-                        print(
-                            "Formular ist gültig und kann verarbeitet werden");
+                        if (kDebugMode) {
+                          if (kDebugMode) {
+                            print(
+                                "Formular ist gültig und kann verarbeitet werden");
+                          }
+                        }
                       } else {
-                        print("Formular ist nicht gültig");
+                        if (kDebugMode) {
+                          print("Formular ist nicht gültig");
+                        }
                       }
                     },
                     child: const Text('Speichern'),
@@ -253,7 +260,7 @@ class _MyFormPageState extends State<MyFormPage> {
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        primary: Colors.blue,
+                        backgroundColor: Colors.blue,
                         textStyle: const TextStyle(color: Colors.white)),
                     onPressed: () {
                       setState(() {
@@ -279,15 +286,19 @@ class _MyFormPageState extends State<MyFormPage> {
                       const SizedBox(width: 25),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                            primary: Colors.blue,
+                            backgroundColor: Colors.blue,
                             textStyle: const TextStyle(color: Colors.white)),
                         onPressed: () {
                           // Wenn alle Validatoren der Felder des Formulars gültig sind.
                           if (_formKey.currentState!.validate()) {
-                            print(
-                                "Formular ist gültig und kann verarbeitet werden");
+                            if (kDebugMode) {
+                              print(
+                                  "Formular ist gültig und kann verarbeitet werden");
+                            }
                           } else {
-                            print("Formular ist nicht gültig");
+                            if (kDebugMode) {
+                              print("Formular ist nicht gültig");
+                            }
                           }
                         },
                         child: const Text('Speichern'),
@@ -320,393 +331,265 @@ class DimensionsForm extends StatefulWidget {
 class _DimensionsFormState extends State<DimensionsForm> {
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return const SizedBox(
         child: Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
-        const Row(
-          children: [
-            Flexible(
-              child: DropdownButtonExample(listElements: items2),
-            ),
-            Flexible(child: DropdownButtonExample(listElements: items3)),
-            Flexible(child: DropdownButtonExample(listElements: items4))
-          ],
+        Padding(
+          padding: EdgeInsets.only(top: 10),
+          child: Row(
+            children: [
+              Flexible(
+                child: Padding(
+                  padding: EdgeInsets.only(right: 4),
+                  child: DropdownButtonExample(listElements: items2),
+                ),
+              ),
+              Flexible(
+                child: Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: DropdownButtonExample(listElements: items3)),
+              ),
+              Flexible(child: DropdownButtonExample(listElements: items4))
+            ],
+          ),
         ),
-        Row(
-          children: [
-            const Flexible(
-                child: DropdownButtonExample(
-              listElements: items5,
-            )),
-            Flexible(
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  labelText: 'm STK',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Bitte Projektnummer eingeben';
-                  }
-                  return null;
-                },
+        Padding(
+          padding: EdgeInsets.only(top: 10),
+          child: Row(
+            children: [
+              Flexible(
+                  child: Padding(
+                padding: EdgeInsets.only(right: 4),
+                child: SizedBox(
+                    height: 29.0,
+                    child: DropdownButtonExample(
+                      listElements: items5,
+                    )),
+              )),
+              Flexible(
+                child: Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: FormTextField(
+                      label: "m STK",
+                    )),
               ),
-            ),
-            Flexible(
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  labelText: 'm A',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Bitte Projektnummer eingeben';
-                  }
-                  return null;
-                },
+              Flexible(
+                child: Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: FormTextField(
+                      label: "m A",
+                    )),
               ),
-            ),
-            Flexible(
-              // wrap your Column in Expanded
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  labelText: 'm B',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Bitte Projektnummer eingeben';
-                  }
-                  return null;
-                },
+              Flexible(
+                child: Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: FormTextField(
+                      label: "m B",
+                    )),
               ),
-            ),
-            Flexible(
-              // wrap your Column in Expanded
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  labelText: 'm C',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Bitte Projektnummer eingeben';
-                  }
-                  return null;
-                },
+              Flexible(
+                child: Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: FormTextField(
+                      label: "m C",
+                    )),
               ),
-            ),
-            Flexible(
-              // wrap your Column in Expanded
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  labelText: 'm D',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Bitte Projektnummer eingeben';
-                  }
-                  return null;
-                },
-              ),
-            ),
-          ],
+              Flexible(
+                  child: FormTextField(
+                label: "m D",
+              )),
+            ],
+          ),
         ),
-        Row(
-          children: [
-            const Flexible(
-                child: DropdownButtonExample(
-              listElements: items6,
-            )),
-            Flexible(
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  labelText: 'm E',
-                  border: OutlineInputBorder(),
+        Padding(
+          padding: EdgeInsets.only(top: 10),
+          child: Row(
+            children: [
+              Flexible(
+                child: Padding(
+                  padding: EdgeInsets.only(right: 4),
+                  child: SizedBox(
+                      height: 29.0,
+                      child: DropdownButtonExample(
+                        listElements: items6,
+                      )),
                 ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Bitte Projektnummer eingeben';
-                  }
-                  return null;
-                },
               ),
-            ),
-            Flexible(
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  labelText: 'm F',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Bitte Projektnummer eingeben';
-                  }
-                  return null;
-                },
+              Flexible(
+                child: Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: FormTextField(
+                      label: "m E",
+                    )),
               ),
-            ),
-            Flexible(
-              // wrap your Column in Expanded
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  labelText: 'm R',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Bitte Projektnummer eingeben';
-                  }
-                  return null;
-                },
+              Flexible(
+                child: Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: FormTextField(
+                      label: "m F",
+                    )),
               ),
-            ),
-            Flexible(
-              // wrap your Column in Expanded
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  labelText: 'm G',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Bitte Projektnummer eingeben';
-                  }
-                  return null;
-                },
+              Flexible(
+                child: Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: FormTextField(
+                      label: "m R",
+                    )),
               ),
-            ),
-            Flexible(
-              // wrap your Column in Expanded
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  labelText: 'm L',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Bitte Projektnummer eingeben';
-                  }
-                  return null;
-                },
+              Flexible(
+                child: Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: FormTextField(
+                      label: "m G",
+                    )),
               ),
-            ),
-          ],
+              Flexible(
+                child: Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: FormTextField(
+                      label: "m L",
+                    )),
+              ),
+            ],
+          ),
         ),
-        Row(
-          children: [
-            const Flexible(
-                child: DropdownButtonExample(
-              listElements: items7,
-            )),
-            Flexible(
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  labelText: 'BOG',
-                  border: OutlineInputBorder(),
+        Padding(
+          padding: EdgeInsets.only(top: 10),
+          child: Row(
+            children: [
+              Flexible(
+                child: Padding(
+                  padding: EdgeInsets.only(right: 4),
+                  child: SizedBox(
+                      height: 29.0,
+                      child: DropdownButtonExample(
+                        listElements: items7,
+                      )),
                 ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Bitte Projektnummer eingeben';
-                  }
-                  return null;
-                },
               ),
-            ),
-            Flexible(
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  labelText: 'STU',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Bitte Projektnummer eingeben';
-                  }
-                  return null;
-                },
+              Flexible(
+                child: Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: FormTextField(
+                      label: "BOG",
+                    )),
               ),
-            ),
-            Flexible(
-              // wrap your Column in Expanded
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  labelText: 'KON',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Bitte Projektnummer eingeben';
-                  }
-                  return null;
-                },
+              Flexible(
+                child: Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: FormTextField(
+                      label: "STU",
+                    )),
               ),
-            ),
-            Flexible(
-              // wrap your Column in Expanded
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  labelText: 'RS',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Bitte Projektnummer eingeben';
-                  }
-                  return null;
-                },
+              Flexible(
+                child: Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: FormTextField(
+                      label: "KON",
+                    )),
               ),
-            ),
-            Flexible(
-              // wrap your Column in Expanded
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  labelText: 'KSP',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Bitte Projektnummer eingeben';
-                  }
-                  return null;
-                },
+              Flexible(
+                child: Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: FormTextField(
+                      label: "RS",
+                    )),
               ),
-            ),
-          ],
+              Flexible(
+                child: Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: FormTextField(
+                      label: "KSP",
+                    )),
+              ),
+            ],
+          ),
         ),
-        Row(
-          children: [
-            const Flexible(
-                child: DropdownButtonExample(
-              listElements: items8,
-            )),
-            Flexible(
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  labelText: 'KSS',
-                  border: OutlineInputBorder(),
+        Padding(
+          padding: EdgeInsets.only(top: 10),
+          child: Row(
+            children: [
+              Flexible(
+                child: Padding(
+                  padding: EdgeInsets.only(right: 4),
+                  child: SizedBox(
+                      height: 29.0,
+                      child: DropdownButtonExample(
+                        listElements: items8,
+                      )),
                 ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Bitte Projektnummer eingeben';
-                  }
-                  return null;
-                },
               ),
-            ),
-            Flexible(
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  labelText: 'VK',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Bitte Projektnummer eingeben';
-                  }
-                  return null;
-                },
+              Flexible(
+                child: Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: FormTextField(
+                      label: "KSS",
+                    )),
               ),
-            ),
-            Flexible(
-              // wrap your Column in Expanded
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  labelText: 'FK',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Bitte Projektnummer eingeben';
-                  }
-                  return null;
-                },
+              Flexible(
+                child: Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: FormTextField(
+                      label: "VK",
+                    )),
               ),
-            ),
-            Flexible(
-              // wrap your Column in Expanded
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  labelText: 'LT',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Bitte Projektnummer eingeben';
-                  }
-                  return null;
-                },
+              Flexible(
+                child: Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: FormTextField(
+                      label: "FK",
+                    )),
               ),
-            ),
-            Flexible(
-              // wrap your Column in Expanded
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  labelText: 'R00',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Bitte Projektnummer eingeben';
-                  }
-                  return null;
-                },
+              Flexible(
+                child: Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: FormTextField(
+                      label: "LT",
+                    )),
               ),
-            ),
-          ],
+              Flexible(
+                child: Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: FormTextField(
+                      label: "R00",
+                    )),
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: 20),
       ],
     ));
   }
 }
 
+class FormTextField extends StatelessWidget {
+  final String label;
+
+  const FormTextField({Key? key, required this.label}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 29.0,
+      child: TextFormField(
+        keyboardType: TextInputType.text,
+        autocorrect: false,
+        style: const TextStyle(fontSize: 10),
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+          contentPadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+        ),
+      ),
+    );
+  }
+}
+
 class DropdownButtonExample extends StatefulWidget {
   final List<String> listElements;
-  const DropdownButtonExample(
-      {Key? key, required List<String> this.listElements})
+  const DropdownButtonExample({Key? key, required this.listElements})
       : super(key: key);
   @override
   State<DropdownButtonExample> createState() => _DropdownButtonExampleState();
@@ -718,12 +601,13 @@ class _DropdownButtonExampleState extends State<DropdownButtonExample> {
     String dropdownValue = widget.listElements.first;
     return DropdownButtonFormField<String>(
       value: dropdownValue,
-      icon: const Icon(Icons.arrow_downward),
       elevation: 16,
       isExpanded: true,
       style: const TextStyle(color: Colors.blue),
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
+        isDense: true,
+        contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 0),
       ),
       onChanged: (String? value) {
         // This is called when the user selects an item.
