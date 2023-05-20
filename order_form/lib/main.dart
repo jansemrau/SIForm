@@ -1,8 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+import 'package:http/http.dart' as http;
 
 void main() => runApp(const MyApp());
+
+double fontSize = 12;
+
+List dimensionFormValues = [];
 const List<String> items = <String>[
   'passiv',
   'Arbeitsbeginn Baustelle',
@@ -153,13 +161,66 @@ class MyFormPage extends StatefulWidget {
   const MyFormPage({Key? key, required this.title}) : super(key: key);
   final String title;
   @override
-  _MyFormPageState createState() => _MyFormPageState();
+  State<MyFormPage> createState() => _MyFormPageState();
 }
 
 class _MyFormPageState extends State<MyFormPage> {
+  final projectController = TextEditingController();
+  final employeeNumberController = TextEditingController();
+  final passwordController = TextEditingController();
+  final timingRecordController = TextEditingController();
+  final placeController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    projectController.dispose();
+    employeeNumberController.dispose();
+    passwordController.dispose();
+    timingRecordController.dispose();
+    placeController.dispose();
+    super.dispose();
+  }
+
+  Future<http.Response> postRequest () async {
+  var url ='https://pae.ipportalegre.pt/testes2/wsjson/api/app/ws-authenticate';
+
+  Map data = {
+    'apikey': '12345678901234567890'
+  }
+  //encode Map to JSON
+  var body = json.encode(data);
+
+  var response = await http.post(url,
+      headers: {"Content-Type": "application/json"},
+      body: body
+  );
+  print("${response.statusCode}");
+  print("${response.body}");
+  return response;
+}
+
+  _summariseValues() {
+    List dimensionFormList = [];
+    for (var element in dimensionForms) {
+      dimensionFormList.add(element.newDimensionsForm);
+    }
+    Map returnObject = {
+      "project": projectController.text,
+      "employeeNumber": employeeNumberController.text,
+      "password": passwordController.text,
+      "timingRecord": timingRecordController.text,
+      "place": placeController.text,
+      "dimensionForms": dimensionFormList
+    };
+    if (kDebugMode) {
+      print(returnObject);
+    }
   }
 
   final _formKey = GlobalKey<FormState>();
@@ -177,80 +238,100 @@ class _MyFormPageState extends State<MyFormPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  TextFormField(
-                    keyboardType: TextInputType.text,
-                    autocorrect: false,
-                    decoration: const InputDecoration(
-                      labelText: 'Projekt',
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Bitte Projektnummer eingeben';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
-                      labelText: 'Mitarbeiternummer 5-stellig',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Passwort',
-                      border: OutlineInputBorder(),
+                  SizedBox(
+                    height: 30.0,
+                    child: TextFormField(
+                      controller: projectController,
+                      keyboardType: TextInputType.text,
+                      autocorrect: false,
+                      style: TextStyle(fontSize: fontSize, color: Colors.black),
+                      decoration: const InputDecoration(
+                        labelText: 'Projekt',
+                        labelStyle: TextStyle(color: Colors.black),
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      ),
+                      // validator: (value) {
+                      //   if (value!.isEmpty) {
+                      //     return 'Bitte Projektnummer eingeben';
+                      //   }
+                      //   return null;
+                      // },
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const Text(
-                    "Zeiterfassung",
-                    textAlign: TextAlign.left,
+                  SizedBox(
+                    height: 30.0,
+                    child: TextFormField(
+                      controller: employeeNumberController,
+                      keyboardType: TextInputType.emailAddress,
+                      style: TextStyle(fontSize: fontSize, color: Colors.black),
+                      decoration: const InputDecoration(
+                        labelText: 'Mitarbeiternummer 5-stellig',
+                        labelStyle: TextStyle(color: Colors.black),
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      ),
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
+                    ),
                   ),
-                  const DropdownButtonExample(
-                    listElements: items,
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    height: 30.0,
+                    child: TextFormField(
+                      controller: passwordController,
+                      obscureText: true,
+                      style: TextStyle(fontSize: fontSize, color: Colors.black),
+                      decoration: const InputDecoration(
+                        labelText: 'Passwort',
+                        labelStyle: TextStyle(color: Colors.black),
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      ),
+                    ),
                   ),
+                  const SizedBox(height: 20),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Zeiterfassung",
+                      textAlign: TextAlign.left,
+                      style: TextStyle(fontSize: fontSize),
+                    ),
+                  ),
+                  DropdownButtonExample(
+                      listElements: items,
+                      dropdownValue: timingRecordController),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         textStyle: const TextStyle(color: Colors.white)),
                     onPressed: () {
-                      // Wenn alle Validatoren der Felder des Formulars gültig sind.
-                      if (_formKey.currentState!.validate()) {
-                        if (kDebugMode) {
-                          if (kDebugMode) {
-                            print(
-                                "Formular ist gültig und kann verarbeitet werden");
-                          }
-                        }
-                      } else {
-                        if (kDebugMode) {
-                          print("Formular ist nicht gültig");
-                        }
-                      }
+                      _summariseValues();
                     },
                     child: const Text('Speichern'),
                   ),
                   const SizedBox(height: 20),
-                  TextFormField(
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Raum / Ort',
-                      border: OutlineInputBorder(),
+                  SizedBox(
+                    height: 30.0,
+                    child: TextFormField(
+                      controller: placeController,
+                      keyboardType: TextInputType.number,
+                      style: TextStyle(fontSize: fontSize, color: Colors.black),
+                      decoration: const InputDecoration(
+                        labelText: 'Raum / Ort',
+                        labelStyle: TextStyle(color: Colors.black),
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      ),
                     ),
-                    validator: zahlValidator,
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly,
-                    ],
                   ),
                   const SizedBox(height: 20),
                   ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
                     itemCount: dimensionForms.length,
@@ -264,7 +345,10 @@ class _MyFormPageState extends State<MyFormPage> {
                         textStyle: const TextStyle(color: Colors.white)),
                     onPressed: () {
                       setState(() {
-                        dimensionForms.add(const DimensionsForm());
+                        Map newDimensionsForm = {};
+                        dimensionFormValues.add(newDimensionsForm);
+                        dimensionForms.add(DimensionsForm(
+                            newDimensionsForm: newDimensionsForm));
                       });
                     },
                     child: const Text('Form hinzufügen'),
@@ -279,7 +363,8 @@ class _MyFormPageState extends State<MyFormPage> {
                             textStyle: const TextStyle(color: Colors.white)),
                         onPressed: () {
                           // reset() setzt alle Felder wieder auf den Initalwert zurück.
-                          _formKey.currentState!.reset();
+                          Navigator.pushNamedAndRemoveUntil(
+                              context, '/', (_) => false);
                         },
                         child: const Text('Löschen'),
                       ),
@@ -289,17 +374,7 @@ class _MyFormPageState extends State<MyFormPage> {
                             backgroundColor: Colors.blue,
                             textStyle: const TextStyle(color: Colors.white)),
                         onPressed: () {
-                          // Wenn alle Validatoren der Felder des Formulars gültig sind.
-                          if (_formKey.currentState!.validate()) {
-                            if (kDebugMode) {
-                              print(
-                                  "Formular ist gültig und kann verarbeitet werden");
-                            }
-                          } else {
-                            if (kDebugMode) {
-                              print("Formular ist nicht gültig");
-                            }
-                          }
+                          _summariseValues();
                         },
                         child: const Text('Speichern'),
                       )
@@ -311,254 +386,376 @@ class _MyFormPageState extends State<MyFormPage> {
           ),
         ));
   }
-
-  String? zahlValidator(value) {
-    var zahl = int.tryParse(value.toString()) ?? 0;
-    if (zahl % 2 == 0) {
-      return 'Es sind nur ungerade Zahlen erlaubt';
-    }
-    return null;
-  }
 }
 
 class DimensionsForm extends StatefulWidget {
-  const DimensionsForm({super.key});
+  Map newDimensionsForm;
+  DimensionsForm({super.key, required this.newDimensionsForm});
 
   @override
   State<DimensionsForm> createState() => _DimensionsFormState();
 }
 
 class _DimensionsFormState extends State<DimensionsForm> {
+  final dropdown1Controller = TextEditingController();
+  final dropdown2Controller = TextEditingController();
+  final dropdown3Controller = TextEditingController();
+
+  final dropdown4Controller = TextEditingController();
+  final mSTKController = TextEditingController();
+  final mAController = TextEditingController();
+  final mBController = TextEditingController();
+  final mCController = TextEditingController();
+  final mDController = TextEditingController();
+
+  final dropdown5Controller = TextEditingController();
+  final mEController = TextEditingController();
+  final mFController = TextEditingController();
+  final mRController = TextEditingController();
+  final mGController = TextEditingController();
+  final mLController = TextEditingController();
+
+  final dropdown6Controller = TextEditingController();
+  final bOGController = TextEditingController();
+  final sTUController = TextEditingController();
+  final kONController = TextEditingController();
+  final rSController = TextEditingController();
+  final kSPController = TextEditingController();
+
+  final dropdown7Controller = TextEditingController();
+  final kSSController = TextEditingController();
+  final vKController = TextEditingController();
+  final fKController = TextEditingController();
+  final lTController = TextEditingController();
+  final r00Controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    dropdown1Controller.addListener(_updateForm);
+    dropdown2Controller.addListener(_updateForm);
+    dropdown3Controller.addListener(_updateForm);
+
+    dropdown4Controller.addListener(_updateForm);
+    mSTKController.addListener(_updateForm);
+    mAController.addListener(_updateForm);
+    mBController.addListener(_updateForm);
+    mCController.addListener(_updateForm);
+    mDController.addListener(_updateForm);
+
+    dropdown5Controller.addListener(_updateForm);
+    mEController.addListener(_updateForm);
+    mFController.addListener(_updateForm);
+    mRController.addListener(_updateForm);
+    mGController.addListener(_updateForm);
+    mLController.addListener(_updateForm);
+
+    dropdown6Controller.addListener(_updateForm);
+    bOGController.addListener(_updateForm);
+    sTUController.addListener(_updateForm);
+    kONController.addListener(_updateForm);
+    rSController.addListener(_updateForm);
+    kSPController.addListener(_updateForm);
+
+    dropdown7Controller.addListener(_updateForm);
+    kSSController.addListener(_updateForm);
+    vKController.addListener(_updateForm);
+    fKController.addListener(_updateForm);
+    lTController.addListener(_updateForm);
+    r00Controller.addListener(_updateForm);
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    super.dispose();
+    dropdown1Controller.dispose();
+    dropdown2Controller.dispose();
+    dropdown3Controller.dispose();
+
+    dropdown4Controller.dispose();
+    mSTKController.dispose();
+    mAController.dispose();
+    mBController.dispose();
+    mCController.dispose();
+    mDController.dispose();
+
+    dropdown5Controller.dispose();
+    mEController.dispose();
+    mFController.dispose();
+    mRController.dispose();
+    mGController.dispose();
+    mLController.dispose();
+
+    dropdown6Controller.dispose();
+    bOGController.dispose();
+    sTUController.dispose();
+    kONController.dispose();
+    rSController.dispose();
+    kSPController.dispose();
+
+    dropdown7Controller.dispose();
+    kSSController.dispose();
+    vKController.dispose();
+    fKController.dispose();
+    lTController.dispose();
+    r00Controller.dispose();
+  }
+
+  _updateForm() {
+    widget.newDimensionsForm = {
+      'd1': dropdown1Controller.text,
+      'd2': dropdown2Controller.text,
+      'd3': dropdown3Controller.text,
+      'd4': dropdown4Controller.text,
+      'mSTK': mSTKController.text,
+      'mA': mAController.text,
+      'mB': mBController.text,
+      'mC': mCController.text,
+      'mD': mDController.text,
+      'd5': dropdown5Controller.text,
+      'mE': mEController.text,
+      'mF': mFController.text,
+      'mR': mRController.text,
+      'mG': mGController.text,
+      'mL': mLController.text,
+      'd6': dropdown6Controller.text,
+      'bOG': bOGController.text,
+      'sTU': sTUController.text,
+      'kON': kONController.text,
+      'rS': rSController.text,
+      'kSP': kSPController.text,
+      'd7': dropdown7Controller.text,
+      'kSS': kSSController.text,
+      'vK': vKController.text,
+      'fK': fKController.text,
+      'lT': lTController.text,
+      'r00': r00Controller.text
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const SizedBox(
+    return SizedBox(
         child: Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            "Massen",
+            textAlign: TextAlign.left,
+          ),
+        ),
         Padding(
-          padding: EdgeInsets.only(top: 10),
+          padding: const EdgeInsets.only(top: 10),
           child: Row(
             children: [
               Flexible(
                 child: Padding(
-                  padding: EdgeInsets.only(right: 4),
-                  child: DropdownButtonExample(listElements: items2),
+                  padding: const EdgeInsets.only(right: 4),
+                  child: DropdownButtonExample(
+                      listElements: items2, dropdownValue: dropdown1Controller),
                 ),
               ),
               Flexible(
                 child: Padding(
-                    padding: EdgeInsets.only(right: 4),
-                    child: DropdownButtonExample(listElements: items3)),
+                    padding: const EdgeInsets.only(right: 4),
+                    child: DropdownButtonExample(
+                        listElements: items3,
+                        dropdownValue: dropdown2Controller)),
               ),
-              Flexible(child: DropdownButtonExample(listElements: items4))
+              Flexible(
+                  child: DropdownButtonExample(
+                      listElements: items4, dropdownValue: dropdown3Controller))
             ],
           ),
         ),
         Padding(
-          padding: EdgeInsets.only(top: 10),
+          padding: const EdgeInsets.only(top: 10),
           child: Row(
             children: [
               Flexible(
                   child: Padding(
-                padding: EdgeInsets.only(right: 4),
+                padding: const EdgeInsets.only(right: 4),
                 child: SizedBox(
-                    height: 29.0,
+                    height: 30.0,
                     child: DropdownButtonExample(
-                      listElements: items5,
-                    )),
+                        listElements: items5,
+                        dropdownValue: dropdown4Controller)),
               )),
               Flexible(
                 child: Padding(
-                    padding: EdgeInsets.only(right: 4),
+                    padding: const EdgeInsets.only(right: 4),
                     child: FormTextField(
-                      label: "m STK",
-                    )),
+                        label: "m STK", textController: mSTKController)),
               ),
               Flexible(
                 child: Padding(
-                    padding: EdgeInsets.only(right: 4),
+                    padding: const EdgeInsets.only(right: 4),
                     child: FormTextField(
-                      label: "m A",
-                    )),
+                        label: "m A", textController: mAController)),
               ),
               Flexible(
                 child: Padding(
-                    padding: EdgeInsets.only(right: 4),
+                    padding: const EdgeInsets.only(right: 4),
                     child: FormTextField(
-                      label: "m B",
-                    )),
+                        label: "m B", textController: mBController)),
               ),
               Flexible(
                 child: Padding(
-                    padding: EdgeInsets.only(right: 4),
+                    padding: const EdgeInsets.only(right: 4),
                     child: FormTextField(
-                      label: "m C",
-                    )),
+                        label: "m C", textController: mCController)),
               ),
               Flexible(
                   child: FormTextField(
-                label: "m D",
-              )),
+                      label: "m D", textController: mDController)),
             ],
           ),
         ),
         Padding(
-          padding: EdgeInsets.only(top: 10),
+          padding: const EdgeInsets.only(top: 10),
           child: Row(
             children: [
               Flexible(
                 child: Padding(
-                  padding: EdgeInsets.only(right: 4),
+                  padding: const EdgeInsets.only(right: 4),
                   child: SizedBox(
-                      height: 29.0,
+                      height: 30.0,
                       child: DropdownButtonExample(
-                        listElements: items6,
-                      )),
+                          listElements: items6,
+                          dropdownValue: dropdown5Controller)),
                 ),
               ),
               Flexible(
                 child: Padding(
-                    padding: EdgeInsets.only(right: 4),
+                    padding: const EdgeInsets.only(right: 4),
                     child: FormTextField(
-                      label: "m E",
-                    )),
+                        label: "m E", textController: mEController)),
               ),
               Flexible(
                 child: Padding(
-                    padding: EdgeInsets.only(right: 4),
+                    padding: const EdgeInsets.only(right: 4),
                     child: FormTextField(
-                      label: "m F",
-                    )),
+                        label: "m F", textController: mFController)),
               ),
               Flexible(
                 child: Padding(
-                    padding: EdgeInsets.only(right: 4),
+                    padding: const EdgeInsets.only(right: 4),
                     child: FormTextField(
-                      label: "m R",
-                    )),
+                        label: "m R", textController: mRController)),
               ),
               Flexible(
                 child: Padding(
-                    padding: EdgeInsets.only(right: 4),
+                    padding: const EdgeInsets.only(right: 4),
                     child: FormTextField(
-                      label: "m G",
-                    )),
+                        label: "m G", textController: mGController)),
               ),
               Flexible(
                 child: Padding(
-                    padding: EdgeInsets.only(right: 4),
+                    padding: const EdgeInsets.only(right: 4),
                     child: FormTextField(
-                      label: "m L",
-                    )),
+                        label: "m L", textController: mLController)),
               ),
             ],
           ),
         ),
         Padding(
-          padding: EdgeInsets.only(top: 10),
+          padding: const EdgeInsets.only(top: 10),
           child: Row(
             children: [
               Flexible(
                 child: Padding(
-                  padding: EdgeInsets.only(right: 4),
+                  padding: const EdgeInsets.only(right: 4),
                   child: SizedBox(
-                      height: 29.0,
+                      height: 30.0,
                       child: DropdownButtonExample(
-                        listElements: items7,
-                      )),
+                          listElements: items7,
+                          dropdownValue: dropdown6Controller)),
                 ),
               ),
               Flexible(
                 child: Padding(
-                    padding: EdgeInsets.only(right: 4),
+                    padding: const EdgeInsets.only(right: 4),
                     child: FormTextField(
-                      label: "BOG",
-                    )),
+                        label: "BOG", textController: bOGController)),
               ),
               Flexible(
                 child: Padding(
-                    padding: EdgeInsets.only(right: 4),
+                    padding: const EdgeInsets.only(right: 4),
                     child: FormTextField(
-                      label: "STU",
-                    )),
+                        label: "STU", textController: sTUController)),
               ),
               Flexible(
                 child: Padding(
-                    padding: EdgeInsets.only(right: 4),
+                    padding: const EdgeInsets.only(right: 4),
                     child: FormTextField(
-                      label: "KON",
-                    )),
+                        label: "KON", textController: kONController)),
               ),
               Flexible(
                 child: Padding(
-                    padding: EdgeInsets.only(right: 4),
+                    padding: const EdgeInsets.only(right: 4),
                     child: FormTextField(
-                      label: "RS",
-                    )),
+                        label: "RS", textController: rSController)),
               ),
               Flexible(
                 child: Padding(
-                    padding: EdgeInsets.only(right: 4),
+                    padding: const EdgeInsets.only(right: 4),
                     child: FormTextField(
-                      label: "KSP",
-                    )),
+                        label: "KSP", textController: kSPController)),
               ),
             ],
           ),
         ),
         Padding(
-          padding: EdgeInsets.only(top: 10),
+          padding: const EdgeInsets.only(top: 10),
           child: Row(
             children: [
               Flexible(
                 child: Padding(
-                  padding: EdgeInsets.only(right: 4),
+                  padding: const EdgeInsets.only(right: 4),
                   child: SizedBox(
-                      height: 29.0,
+                      height: 30.0,
                       child: DropdownButtonExample(
-                        listElements: items8,
-                      )),
+                          listElements: items8,
+                          dropdownValue: dropdown7Controller)),
                 ),
               ),
               Flexible(
                 child: Padding(
-                    padding: EdgeInsets.only(right: 4),
+                    padding: const EdgeInsets.only(right: 4),
                     child: FormTextField(
-                      label: "KSS",
-                    )),
+                        label: "KSS", textController: kSSController)),
               ),
               Flexible(
                 child: Padding(
-                    padding: EdgeInsets.only(right: 4),
+                    padding: const EdgeInsets.only(right: 4),
                     child: FormTextField(
-                      label: "VK",
-                    )),
+                        label: "VK", textController: vKController)),
               ),
               Flexible(
                 child: Padding(
-                    padding: EdgeInsets.only(right: 4),
+                    padding: const EdgeInsets.only(right: 4),
                     child: FormTextField(
-                      label: "FK",
-                    )),
+                        label: "FK", textController: fKController)),
               ),
               Flexible(
                 child: Padding(
-                    padding: EdgeInsets.only(right: 4),
+                    padding: const EdgeInsets.only(right: 4),
                     child: FormTextField(
-                      label: "LT",
-                    )),
+                        label: "LT", textController: lTController)),
               ),
               Flexible(
                 child: Padding(
-                    padding: EdgeInsets.only(right: 4),
+                    padding: const EdgeInsets.only(right: 4),
                     child: FormTextField(
-                      label: "R00",
-                    )),
+                        label: "R00", textController: r00Controller)),
               ),
             ],
           ),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
       ],
     ));
   }
@@ -566,22 +763,30 @@ class _DimensionsFormState extends State<DimensionsForm> {
 
 class FormTextField extends StatelessWidget {
   final String label;
+  final TextEditingController textController;
 
-  const FormTextField({Key? key, required this.label}) : super(key: key);
+  const FormTextField(
+      {Key? key, required this.label, required this.textController})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 29.0,
+      height: 30.0,
       child: TextFormField(
+        controller: textController,
         keyboardType: TextInputType.text,
         autocorrect: false,
-        style: const TextStyle(fontSize: 10),
+        style: const TextStyle(fontSize: 10, color: Colors.black),
         decoration: InputDecoration(
           labelText: label,
+          labelStyle: const TextStyle(color: Colors.black),
           border: const OutlineInputBorder(),
           contentPadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
         ),
+        inputFormatters: <TextInputFormatter>[
+          FilteringTextInputFormatter.digitsOnly,
+        ],
       ),
     );
   }
@@ -589,7 +794,9 @@ class FormTextField extends StatelessWidget {
 
 class DropdownButtonExample extends StatefulWidget {
   final List<String> listElements;
-  const DropdownButtonExample({Key? key, required this.listElements})
+  TextEditingController dropdownValue;
+  DropdownButtonExample(
+      {Key? key, required this.listElements, required this.dropdownValue})
       : super(key: key);
   @override
   State<DropdownButtonExample> createState() => _DropdownButtonExampleState();
@@ -598,12 +805,12 @@ class DropdownButtonExample extends StatefulWidget {
 class _DropdownButtonExampleState extends State<DropdownButtonExample> {
   @override
   Widget build(BuildContext context) {
-    String dropdownValue = widget.listElements.first;
+    widget.dropdownValue.text = widget.listElements.first;
     return DropdownButtonFormField<String>(
-      value: dropdownValue,
+      value: widget.dropdownValue.text,
       elevation: 16,
       isExpanded: true,
-      style: const TextStyle(color: Colors.blue),
+      style: TextStyle(fontSize: fontSize, color: Colors.black),
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
         isDense: true,
@@ -612,7 +819,7 @@ class _DropdownButtonExampleState extends State<DropdownButtonExample> {
       onChanged: (String? value) {
         // This is called when the user selects an item.
         setState(() {
-          dropdownValue = value!;
+          widget.dropdownValue.text = value!;
         });
       },
       items: widget.listElements.map<DropdownMenuItem<String>>((String value) {
