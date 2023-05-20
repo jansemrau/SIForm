@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 void main() => runApp(const MyApp());
 
 double fontSize = 12;
-
+Color backgroundColor = Color.fromARGB(255, 26, 5, 141);
 List dimensionFormValues = [];
 const List<String> items = <String>[
   'passiv',
@@ -149,9 +149,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
       home: const MyFormPage(title: 'Bliso Formular'),
     );
   }
@@ -188,18 +185,33 @@ class _MyFormPageState extends State<MyFormPage> {
   }
 
   Future<http.Response> postRequest(data) async {
-    var url = 'https://www.mygrab.at/out.php';
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult != ConnectivityResult.mobile &&
+        connectivityResult != ConnectivityResult.wifi) {
+      AlertDialog(
+          title: const Text("Network error"),
+          content: const Text("No Internetconnection"),
+          actions: [
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () {},
+            )
+          ]);
+      throw ("Error");
+    } else {
+      var url = Uri.parse("https://www.mygrab.at/out.php");
 
-    //encode Map to JSON
-    var body = json.encode(data);
+      //encode Map to JSON
+      var body = json.encode(data);
 
-    var response = await http.post(url as Uri,
-        headers: {"Content-Type": "application/json"}, body: body);
-    if (kDebugMode) {
-      print("${response.statusCode}");
-      print(response.body);
+      var response = await http.post(url,
+          headers: {"Content-Type": "application/json"}, body: body);
+      if (kDebugMode) {
+        print("${response.statusCode}");
+        print(response.body);
+      }
+      return response;
     }
-    return response;
   }
 
   _summariseValues() {
@@ -226,6 +238,7 @@ class _MyFormPageState extends State<MyFormPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          backgroundColor: backgroundColor,
           title: Text(widget.title),
         ),
         body: SingleChildScrollView(
@@ -305,7 +318,7 @@ class _MyFormPageState extends State<MyFormPage> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
+                        backgroundColor: backgroundColor,
                         textStyle: const TextStyle(color: Colors.white)),
                     onPressed: () {
                       _summariseValues();
@@ -339,7 +352,7 @@ class _MyFormPageState extends State<MyFormPage> {
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
+                        backgroundColor: backgroundColor,
                         textStyle: const TextStyle(color: Colors.white)),
                     onPressed: () {
                       setState(() {
@@ -369,7 +382,7 @@ class _MyFormPageState extends State<MyFormPage> {
                       const SizedBox(width: 25),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
+                            backgroundColor: backgroundColor,
                             textStyle: const TextStyle(color: Colors.white)),
                         onPressed: () {
                           _summariseValues();
