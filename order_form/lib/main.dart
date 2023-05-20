@@ -9,7 +9,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 void main() => runApp(const MyApp());
 
 double fontSize = 12;
-Color backgroundColor = Color.fromARGB(255, 26, 5, 141);
+Color backgroundColor = const Color.fromARGB(255, 26, 5, 141);
 List dimensionFormValues = [];
 const List<String> items = <String>[
   'passiv',
@@ -148,8 +148,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: const MyFormPage(title: 'Bliso Formular'),
+    return const MaterialApp(
+      home: MyFormPage(title: 'Bliso Formular'),
     );
   }
 }
@@ -835,9 +835,7 @@ class _DropdownButtonExampleState extends State<DropdownButtonExample> {
       },
       items: widget.listElements.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
+            value: value, child: SizedBox(width: 500, child: Text(value)));
       }).toList(),
     );
   }
