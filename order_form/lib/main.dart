@@ -187,23 +187,20 @@ class _MyFormPageState extends State<MyFormPage> {
     super.dispose();
   }
 
-  Future<http.Response> postRequest () async {
-  var url ='https://pae.ipportalegre.pt/testes2/wsjson/api/app/ws-authenticate';
+  Future<http.Response> postRequest(data) async {
+    var url = 'https://www.mygrab.at/out.php';
 
-  Map data = {
-    'apikey': '12345678901234567890'
+    //encode Map to JSON
+    var body = json.encode(data);
+
+    var response = await http.post(url as Uri,
+        headers: {"Content-Type": "application/json"}, body: body);
+    if (kDebugMode) {
+      print("${response.statusCode}");
+      print(response.body);
+    }
+    return response;
   }
-  //encode Map to JSON
-  var body = json.encode(data);
-
-  var response = await http.post(url,
-      headers: {"Content-Type": "application/json"},
-      body: body
-  );
-  print("${response.statusCode}");
-  print("${response.body}");
-  return response;
-}
 
   _summariseValues() {
     List dimensionFormList = [];
@@ -221,6 +218,7 @@ class _MyFormPageState extends State<MyFormPage> {
     if (kDebugMode) {
       print(returnObject);
     }
+    postRequest(returnObject);
   }
 
   final _formKey = GlobalKey<FormState>();
