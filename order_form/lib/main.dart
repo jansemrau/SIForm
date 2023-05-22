@@ -5,6 +5,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 
 void main() => runApp(const MyApp());
 
@@ -376,6 +377,9 @@ class _MyFormPageState extends State<MyFormPage> {
                           // reset() setzt alle Felder wieder auf den Initalwert zurück.
                           Navigator.pushNamedAndRemoveUntil(
                               context, '/', (_) => false);
+                          setState(() {
+                            dimensionForms = [];
+                          });
                         },
                         child: const Text('Löschen'),
                       ),
@@ -805,8 +809,8 @@ class FormTextField extends StatelessWidget {
 
 class DropdownButtonExample extends StatefulWidget {
   final List<String> listElements;
-  TextEditingController dropdownValue;
-  DropdownButtonExample(
+  final TextEditingController dropdownValue;
+  const DropdownButtonExample(
       {Key? key, required this.listElements, required this.dropdownValue})
       : super(key: key);
   @override
@@ -815,24 +819,24 @@ class DropdownButtonExample extends StatefulWidget {
 
 class _DropdownButtonExampleState extends State<DropdownButtonExample> {
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     widget.dropdownValue.text = widget.listElements.first;
-    return DropdownButtonFormField<String>(
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButton2(
       value: widget.dropdownValue.text,
-      elevation: 16,
       isExpanded: true,
       style: TextStyle(fontSize: fontSize, color: Colors.black),
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        isDense: true,
-        contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-      ),
       onChanged: (String? value) {
-        // This is called when the user selects an item.
         setState(() {
           widget.dropdownValue.text = value!;
         });
       },
+      buttonStyleData: const ButtonStyleData(height: 40),
+      dropdownStyleData: const DropdownStyleData(width: 200),
       items: widget.listElements.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
             value: value, child: SizedBox(width: 500, child: Text(value)));
